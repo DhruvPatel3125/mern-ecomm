@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const express = require("express");
 const router = express.Router();
 const stripe = require("stripe")(
-  "sk_test_51R3aYhRoaufNrMbLkDoMbKKld8ROjdYJ8mGnkDh1HGfbvnRwpMSPwhyRGuWVSlfUPyGi3bmubn4IRdJHFQ6nv5yZ00lgWXz3xO"
+  "sk_test_51R4FemRte5P3YdHuH2qlgSZjWVMmwbneZMiDNN65RA0UZGE4lf8GiKpmYRJiUiPLVE7WcYo9jnAsex5l8pd5AKwo00Zbj0adLv"
 );
 const Order = require("../models/orderModel");
 
@@ -38,51 +38,45 @@ router.post("/placeorder", async (req, res) => {
       }
     );
 
-    // Return success response with payment data
-    res.status(200).json({
-      success: true,
-      message: "Payment successful",
-      paymentId: payment.id,
-      amount: payment.amount / 100, // Convert back to rupees for display
-      customer: payment.customer,
-    });
+    // If payment was successful, create the order in database
+    if (payment) {
+      const newOrder = new Order({
+        userId: currentUser._id,
+        name: currentUser.name,
+        email: currentUser.email,
+        orderItems: cartItems,
+        shippingAddress: {
+          address: token.card.address_line1,
+          city: token.card.address_city,
+          postalCode: token.card.address_zip,
+          country: token.card.address_country,
+        },
+        orderAmount: subtotal,
+        transactionId: payment.source.id,
+        isDelivered: false,
+      });
+
+      // Save order using async/await instead of callback
+      const savedOrder = await newOrder.save();
+      
+      // Return success response with payment and order data
+      return res.status(200).json({
+        success: true,
+        message: "Order placed successfully",
+        paymentId: payment.id,
+        amount: payment.amount / 100,
+        order: savedOrder
+      });
+    } else {
+      throw new Error("Payment verification failed");
+    }
   } catch (error) {
-    console.error("Payment error:", error);
+    console.error("Payment or order error:", error);
     res.status(400).json({
       success: false,
       message: "Payment failed",
       error: error.message,
     });
-  }
-  if (payment) {
-    const order = new Order({
-      userId: currentUser._id,
-      name: currentUser.name,
-      email: currentUser.email,
-      orderItems: cartItems,
-      shippingAddress: {
-        address: token.card.address_line1,
-        city: token.card.address_city,
-        postalCode: token.card.address_zip,
-        country: token.card.address_country,
-      },
-
-      orderAmount: subtotal,
-      transactionId: payment.source.id,
-      isDelivered: false,
-    });
-    order.save((err) => {
-      if (err) return res.status(500).json({ message: "some error occured" });
-      else {
-        res.status(200).json({
-          success: true,
-          message: "Order placed successfully",
-          order,
-        });
-      }
-    });
-  } else {
-    return res.status(400).json({ message: "payment failed" });
   }
 });
 

@@ -8,14 +8,21 @@ export default function Checkout({ amount }) {
     const userState = useSelector(state => state.loginUserReducer);
     const { currentUser } = userState;
     
-    // Make sure we have a valid amount
-    const finalAmount = Math.round(amount * 100); // Convert to paise for Stripe
+    // Make sure we have a valid amount and it's greater than zero
+    const finalAmount = Math.max(1, Math.round(amount * 100)); // Minimum 1 (1 paise)
     
     const tokenHandler = async (token) => {
         try {
+            console.log("Token received:", token); // Debug token
+            
             dispatch({ type: 'PLACE_ORDER_REQUEST' });
             
             const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            
+            // Make sure cart is not empty
+            if (!cartItems.length) {
+                throw new Error("Your cart is empty");
+            }
             
             const response = await axios.post('/api/orders/placeorder', {
                 token,
@@ -32,7 +39,7 @@ export default function Checkout({ amount }) {
             localStorage.removeItem('cartItems');
             dispatch({ type: 'DELETE_FROM_CART', payload: [] });
             
-            // Show success message (you can customize this)
+            // Show success message
             alert('Payment Successful! Your order has been placed.');
             
             // Redirect to home or order confirmation page
@@ -40,11 +47,17 @@ export default function Checkout({ amount }) {
             
         } catch (error) {
             console.error('Payment Error:', error);
-            dispatch({ 
-                type: 'PLACE_ORDER_FAILED', 
-                payload: error.response?.data?.message || 'Payment failed. Please try again.'
-            });
-            alert('Payment failed. Please try again.');
+            
+            // Get the most useful error message
+            const errorMessage = 
+                error.response?.data?.error || 
+                error.response?.data?.message || 
+                error.message || 
+                'Payment failed. Please try again.';
+                
+            dispatch({ type: 'PLACE_ORDER_FAILED', payload: errorMessage });
+            
+            alert(`Payment failed: ${errorMessage}`);
         }
     };
 
@@ -55,13 +68,18 @@ export default function Checkout({ amount }) {
                     amount={finalAmount}
                     shippingAddress
                     token={tokenHandler}
-                    stripeKey="pk_test_51R3aYhRoaufNrMbL8o7OU4lS7OGD15pizk2RWgPB2oMRMZB2SjfwKwTtZxKJNMPv1JC8okoxOEY3PKiHFap34WRc00VEBGt4iq" // ⚠️ REPLACE WITH YOUR ACTUAL PUBLISHABLE KEY
+                    stripeKey="pk_test_51R4FemRte5P3YdHuiiZoB5xBJwXw1Libwr90Kc65VI8da4VNydkgeDYnh4tnODltuuOhn06P6zzDl2a6VC4CHg9700UGwrazmY"
                     currency="INR"
                     name="Shay Shop"
                     description={`Your total is ₹${amount}`}
                     email={currentUser.email}
+                    billingAddress={true}
+                    zipCode={true}
+                    allowRememberMe={true}
+                    reconfigureOnUpdate={false}
+                    // Test card: use 4242 4242 4242 4242, any future date, any 3 digits for CVC, any 5 digits for postal
                 >
-                    <button className="btn">Checkout</button>
+                    <button className="btn">Pay Now ₹{amount}</button>
                 </StripeCheckout>
             ) : (
                 <div>
