@@ -6,6 +6,7 @@ import ProductDescription from './screens/ProductDescription';
 import Cartscreen from './screens/Cartscreen';
 import Registerscreen from './screens/Registerscreen';
 import Loginscreen from './screens/Loginscreen';
+import OrderScreen from './screens/OrderScreen';
 function App() {
   return (
     <div className="App">
@@ -17,6 +18,8 @@ function App() {
           <Route path="/cart" element={<Cartscreen />} />
           <Route path="/register" element={<Registerscreen />} />
           <Route path="/login" element={<Loginscreen />} />
+          <Route path="/orders" element={<OrderScreen />} />
+
         </Routes>
       </BrowserRouter>
     </div>
