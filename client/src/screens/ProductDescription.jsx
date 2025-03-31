@@ -5,6 +5,7 @@ import { getProductById } from "../actions/productAction";
 import { addtocart } from "../actions/cartAction";
 import Loading from "../components/Loader";
 import Error from "../components/Error";
+import Review from "../components/Review";
 
 export default function ProductDescription() {
   const { id } = useParams();
@@ -66,8 +67,11 @@ export default function ProductDescription() {
               disabled={!product.countInStock}
             >
               {product.countInStock === 0 ? "Out of Stock" : "Add to Cart"}
+
             </button>
           </div>
+          <hr />
+          <Review product={product}/>
         </div>
       </div>
     </div>

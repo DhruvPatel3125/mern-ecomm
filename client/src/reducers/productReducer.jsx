@@ -36,3 +36,21 @@ export const getProductByIdReducer = (state = initialSingleProductState, action)
   }
 };
   
+
+export const addproductReviewReducer=(state={},action)=>{
+  switch (action.type) {
+    case 'ADD_PRODUCT_REVIEW_REQUEST': return{
+      loding:true
+    }
+    case 'ADD_PRODUCT_REVIEW_SUCCESS': return{
+      loding:false, 
+      success:true
+    }
+    case 'ADD_PRODUCT_REVIEW_REQUEST': return{
+      loding:false,
+      error:true
+    }  
+    default:return state
+     
+  }
+}

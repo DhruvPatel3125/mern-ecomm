@@ -78,3 +78,14 @@ export const filterProducts = (searchkey, shortKey, category) => (dispatch) => {
   });
 };
 //8-17
+
+export const addproductReview = (review,productid)=>(dispatch,getState)=>{
+  dispatch({type:"ADD_PRODUCT_REVIEW_REQUEST"})
+  const currentUser = getState().loginReducer.currentUser
+  axios.post('api/products/addreview',{review,productid,currentUser}).then(res=>{
+    console.log(res);
+    dispatch({type:'ADD_PRODUCT_REVIEW_SUCCESS'})
+  }).catch(err=>{
+    dispatch({type:"ADD_PRODUCT_REVIEW_FAILED"})
+  })
+}
