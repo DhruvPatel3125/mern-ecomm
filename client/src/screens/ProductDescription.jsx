@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getProductById } from "../actions/productAction";
+import { getProductById, deleteReview, editReview } from "../actions/productAction";
 import { addtocart } from "../actions/cartAction";
 import Loading from "../components/Loader";
 import Error from "../components/Error";
 import Review from "../components/Review";
+import Rating from "react-rating"; // Ensure this is the correct library or file path
 
 export default function ProductDescription() {
   const { id } = useParams();
@@ -13,7 +14,12 @@ export default function ProductDescription() {
   const { loading, product, error } = useSelector(
     (state) => state.getProductByIdReducer
   );
+  const userState = useSelector(state => state.loginUserReducer);
+  const { currentUser } = userState;
   const [quantity, setQuantity] = useState(1);
+  const [editingReview, setEditingReview] = useState(null);
+  const [editedComment, setEditedComment] = useState("");
+  const [editedRating, setEditedRating] = useState(5);
 
   useEffect(() => {
     dispatch(getProductById(id));
@@ -26,6 +32,26 @@ export default function ProductDescription() {
   const handleAddToCart = () => {
     console.log("Adding to cart:", product, quantity);
     dispatch(addtocart(product, quantity));
+  };
+
+  const handleEditReview = (review) => {
+    setEditingReview(review);
+    setEditedComment(review.comment);
+    setEditedRating(review.rating);
+  };
+
+  const handleUpdateReview = async () => {
+    await dispatch(editReview(product._id, editingReview._id, {
+      rating: editedRating,
+      comment: editedComment
+    }));
+    setEditingReview(null);
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm('Are you sure you want to delete this review?')) {
+      await dispatch(deleteReview(product._id, reviewId));
+    }
   };
 
   return (
@@ -73,6 +99,81 @@ export default function ProductDescription() {
           <hr />
           <Review product={product}/>
         </div>
+      </div>
+      <div className="row mt-5">
+        <div className="col-md-6">
+          <h3>Reviews ({product.reviews?.length || 0})</h3>
+          {product.reviews && product.reviews.length > 0 ? (
+            product.reviews.map((review) => (
+              <div key={review._id} className="card mb-3">
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="card-title">{review.name}</h5>
+                    {currentUser && currentUser._id === review.userid && (
+                      <div className="review-actions">
+                        <button 
+                          className="btn btn-sm btn-outline-primary me-2"
+                          onClick={() => handleEditReview(review)}
+                        >
+                          <i className="fa fa-edit"></i>
+                        </button>
+                        <button 
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleDeleteReview(review._id)}
+                        >
+                          <i className="fa fa-trash"></i>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {editingReview && editingReview._id === review._id ? (
+                    <div className="edit-review-form mt-3">
+                      <Rating
+                        initialRating={editedRating}
+                        emptySymbol="fa fa-star-o fa-1x"
+                        fullSymbol="fa fa-star fa-1x"
+                        onChange={value => setEditedRating(value)}
+                      />
+                      <textarea
+                        className="form-control mt-2"
+                        value={editedComment}
+                        onChange={e => setEditedComment(e.target.value)}
+                      />
+                      <div className="mt-2">
+                        <button 
+                          className="btn btn-primary btn-sm me-2"
+                          onClick={handleUpdateReview}
+                        >
+                          Save
+                        </button>
+                        <button 
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setEditingReview(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <Rating
+                        initialRating={review.rating}
+                        emptySymbol="fa fa-star-o fa-1x"
+                        fullSymbol="fa fa-star fa-1x"
+                        readonly
+                      />
+                      <p className="card-text mt-2">{review.comment}</p>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No reviews yet</p>
+          )}
+        </div>
+        {/* ...existing Review component... */}
       </div>
     </div>
   );

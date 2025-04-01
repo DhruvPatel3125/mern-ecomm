@@ -37,20 +37,45 @@ export const getProductByIdReducer = (state = initialSingleProductState, action)
 };
   
 
-export const addproductReviewReducer=(state={},action)=>{
+export const addproductReviewReducer = (state = {}, action) => {
   switch (action.type) {
-    case 'ADD_PRODUCT_REVIEW_REQUEST': return{
-      loding:true
-    }
-    case 'ADD_PRODUCT_REVIEW_SUCCESS': return{
-      loding:false, 
-      success:true
-    }
-    case 'ADD_PRODUCT_REVIEW_REQUEST': return{
-      loding:false,
-      error:true
-    }  
-    default:return state
-     
+    case 'ADD_PRODUCT_REVIEW_REQUEST':
+      return {
+        loading: true // Fix typo 'loding'
+      }
+    case 'ADD_PRODUCT_REVIEW_SUCCESS':
+      return {
+        loading: false,
+        success: true
+      }
+    case 'ADD_PRODUCT_REVIEW_FAILED': // Fix wrong action type
+      return {
+        loading: false,
+        error: action.payload
+      }
+    default:
+      return state
   }
-}
+};
+
+export const reviewActionReducer = (state = {}, action) => {
+    switch (action.type) {
+        case 'EDIT_REVIEW_REQUEST':
+            return {
+                ...state,
+                loading: true
+            };
+        case 'EDIT_REVIEW_SUCCESS':
+            return {
+                loading: false,
+                success: true
+            };
+        case 'EDIT_REVIEW_FAILED':
+            return {
+                loading: false,
+                error: action.payload
+            };
+        default:
+            return state;
+    }
+};

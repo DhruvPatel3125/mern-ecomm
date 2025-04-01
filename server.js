@@ -9,12 +9,12 @@ app.use(express.json());
 require('./db');
 
 // Import routes
-const productsRoute = require("./routes/productRoute");
+const productRoute = require('./routes/productRoute');
 const userRoute = require("./routes/userRoute");
 const orderRout = require('./routes/orderRout')
 
 // Use routes
-app.use('/api/products/', productsRoute);
+app.use('/api/products', productRoute);
 app.use('/api/users/', userRoute);
 app.use('/api/orders/',orderRout)
 

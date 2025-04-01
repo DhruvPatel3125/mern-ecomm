@@ -79,13 +79,94 @@ export const filterProducts = (searchkey, shortKey, category) => (dispatch) => {
 };
 //8-17
 
-export const addproductReview = (review,productid)=>(dispatch,getState)=>{
-  dispatch({type:"ADD_PRODUCT_REVIEW_REQUEST"})
-  const currentUser = getState().loginReducer.currentUser
-  axios.post('api/products/addreview',{review,productid,currentUser}).then(res=>{
-    console.log(res);
-    dispatch({type:'ADD_PRODUCT_REVIEW_SUCCESS'})
-  }).catch(err=>{
-    dispatch({type:"ADD_PRODUCT_REVIEW_FAILED"})
-  })
-}
+export const addproductReview = (review, productid) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: 'ADD_PRODUCT_REVIEW_REQUEST' });
+    
+    const currentUser = getState().loginUserReducer.currentUser;
+    if (!currentUser) {
+      throw new Error('Please login to submit a review');
+    }
+
+    const response = await axios.post('/api/products/addreview', {
+      review,
+      productid,
+      currentUser
+    });
+
+    dispatch({ type: 'ADD_PRODUCT_REVIEW_SUCCESS' });
+    
+    // Refresh product details to show new review
+    dispatch(getProductById(productid));
+    
+  } catch (error) {
+    dispatch({
+      type: 'ADD_PRODUCT_REVIEW_FAILED',
+      payload: error.response?.data?.message || error.message
+    });
+  }
+};
+
+// Add these new action creators
+
+export const editReview = (productId, reviewId, updatedReview) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: 'EDIT_REVIEW_REQUEST' });
+    
+    const currentUser = getState().loginUserReducer.currentUser;
+    if (!currentUser) {
+      throw new Error('Please login to edit review');
+    }
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    const response = await axios.put(
+      `/api/products/${productId}/reviews/${reviewId}`,
+      {
+        ...updatedReview,
+        userid: currentUser._id
+      },
+      config
+    );
+
+    dispatch({ type: 'EDIT_REVIEW_SUCCESS' });
+    dispatch(getProductById(productId)); // Refresh product details
+
+  } catch (error) {
+    dispatch({
+      type: 'EDIT_REVIEW_FAILED',
+      payload: error.response?.data?.message || error.message
+    });
+  }
+};
+
+export const deleteReview = (productId, reviewId) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: 'DELETE_REVIEW_REQUEST' });
+    
+    const currentUser = getState().loginUserReducer.currentUser;
+    if (!currentUser) {
+      throw new Error('Please login to delete review');
+    }
+
+    const config = {
+      data: { userid: currentUser._id }
+    };
+
+    await axios.delete(`/api/products/${productId}/reviews/${reviewId}`, config);
+
+    dispatch({ type: 'DELETE_REVIEW_SUCCESS' });
+    // Refresh product details
+    dispatch(getProductById(productId));
+    
+  } catch (error) {
+    dispatch({
+      type: 'DELETE_REVIEW_FAILED',
+      payload: error.response?.data?.message || error.message
+    });
+  }
+};
