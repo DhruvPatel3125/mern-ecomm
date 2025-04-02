@@ -28,3 +28,38 @@ export const logoutUser = () => async (dispatch) => {
     dispatch({ type: 'USER_LOGOUT' });
     window.location.href = '/login';
 };
+
+export const updateUser = (updatedUser, userId) => async (dispatch) => {
+    try {
+        dispatch({ type: 'USER_UPDATE_REQUEST' });
+
+        const response = await axios.post('/api/users/update', {
+            updatedUser,
+            userId
+        });
+
+        dispatch({ type: 'USER_UPDATE_SUCCESS' });
+        
+        // Update the currentUser in localStorage and state
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const updatedCurrentUser = {
+            ...currentUser,
+            name: updatedUser.name,
+            email: updatedUser.email
+        };
+        localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
+        
+        dispatch({ type: 'USER_LOGIN_SUCCESS', payload: updatedCurrentUser });
+
+        // Show success message
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+
+    } catch (error) {
+        dispatch({
+            type: 'USER_UPDATE_FAILED',
+            payload: error.response?.data?.message || error.message
+        });
+    }
+};

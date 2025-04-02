@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addproductReview } from "../actions/productAction";
 import Success from "./Success";
 import Error from "./Error";
-import Loader from "./Loader";
+import Loader from "./Loader";  
 
 export default function Review({ product }) {
     const dispatch = useDispatch();

@@ -7,6 +7,7 @@ import Cartscreen from './screens/Cartscreen';
 import Registerscreen from './screens/Registerscreen';
 import Loginscreen from './screens/Loginscreen';
 import OrderScreen from './screens/OrderScreen';
+import Profilescreen from './screens/Profilescreen';
 function App() {
   return (
     <div className="App">
@@ -19,6 +20,7 @@ function App() {
           <Route path="/register" element={<Registerscreen />} />
           <Route path="/login" element={<Loginscreen />} />
           <Route path="/orders" element={<OrderScreen />} />
+          <Route path="/profile" element={<Profilescreen />} />
 
         </Routes>
       </BrowserRouter>
