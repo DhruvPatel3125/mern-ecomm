@@ -341,3 +341,18 @@ input{
 .auth-link:hover {
   text-decoration: underline;
 }
+
+.admin li{
+  list-style-type: none !important;
+  display: inline !important;
+  margin-left:20px !important;
+  text-decoration: none !important;
+  color: black !important;
+  
+}
+
+.admin{
+  background-color: aquamarine !important; 
+  text-decoration: none !important;
+  
+}
