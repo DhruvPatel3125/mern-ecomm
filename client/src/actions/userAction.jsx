@@ -63,3 +63,13 @@ export const updateUser = (updatedUser, userId) => async (dispatch) => {
         });
     }
 };
+
+export const getAllUser=()=>dispatch=>{
+    dispatch({type:'GET_ALLUSERS_REQUEST'})
+    axios.get('/api/users/getallusers').then(res=>{
+        dispatch({type:"DET_ALLUSERS_SUCCESS" , payload : res.data})
+    }).catch(err=>{
+    dispatch({typr:'GET_ALLUSERS_FAILED',payload : err})
+})
+
+}
