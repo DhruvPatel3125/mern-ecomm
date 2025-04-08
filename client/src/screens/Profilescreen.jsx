@@ -7,9 +7,10 @@ import Success from "../components/Success";
 
 export default function Profilescreen() {
     const loginstate = useSelector((state) => state.loginUserReducer);
-    const updatestate = useSelector((state) => state.updateReducer);
-    const { loading, error, success } = updatestate;
-    const currentUser = loginstate.currentUser;
+    const updatestate = useSelector((state) => state.updateReducer || {});
+    
+    const { loading = false, error = null, success = false } = updatestate;
+    const currentUser = loginstate?.currentUser;
     const dispatch = useDispatch();
     
     const [name, setName] = useState(currentUser?.name || '');
