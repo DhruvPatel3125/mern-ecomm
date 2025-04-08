@@ -3,7 +3,7 @@ import {thunk} from "redux-thunk";
 import { composeWithDevTools } from '@redux-devtools/extension';
 import { getAllProductsReducer, getProductByIdReducer,addproductReviewReducer, reviewActionReducer } from "./reducers/productReducer";
 import { cartReducer } from "./reducers/cartReducer";
-import { loginUserReducer, registerNewUserReducer, updateReducer } from "./reducers/userReducer";
+import { loginUserReducer, registerNewUserReducer, updateReducer, getAllusersReducer, deleteUserReducer } from "./reducers/userReducer";
 import { placeOrderReducer } from "./reducers/orderReducer";
 
 const finalReducer = combineReducers({
@@ -15,7 +15,9 @@ const finalReducer = combineReducers({
   placeOrderReducer: placeOrderReducer,
   addproductReviewReducer: addproductReviewReducer,
   reviewAction: reviewActionReducer,
-  updateReducer: updateReducer
+  updateReducer: updateReducer,
+  getAllUsers: getAllusersReducer,
+  deleteUser: deleteUserReducer
 });
 
 const cartItemsFromStorage = localStorage.getItem("cartItems")

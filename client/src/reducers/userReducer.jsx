@@ -132,3 +132,47 @@ export const getAllusersReducer = (state = initialState, action) => {
             return state;
     }
 };
+
+export const getAllUsers = () => async (dispatch) => {
+    dispatch({ type: "GET_ALLUSERS_REQUEST" });
+    try {
+        const { data } = await axios.get("/api/users/getallusers");
+        dispatch({ type: "GET_ALLUSERS_SUCCESS", payload: data });
+    } catch (error) {
+        dispatch({ type: "GET_ALLUSERS_FAILED", payload: error.message });
+    }
+};
+
+export const deleteUserReducer = (state = initialState, action) => {
+    switch (action.type) {
+        case 'DELETE_USER_REQUEST':
+            return {
+                ...state,
+                loading: true
+            };
+        case 'DELETE_USER_SUCCESS':
+            return {
+                ...state,
+                loading: false,
+                success: true
+            };
+        case 'DELETE_USER_FAILED':
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            };
+        default:
+            return state;
+    }
+};
+
+export const deleteUser = (userId) => async (dispatch) => {
+    dispatch({ type: "DELETE_USER_REQUEST" });
+    try {
+        await axios.delete(`/api/users/${userId}`);
+        dispatch({ type: "DELETE_USER_SUCCESS" });
+    } catch (error) {
+        dispatch({ type: "DELETE_USER_FAILED", payload: error.message });
+    }
+};

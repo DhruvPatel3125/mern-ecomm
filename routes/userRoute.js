@@ -80,14 +80,31 @@ router.post("/update", async (req, res) => {
     }
 });
 
-router.get("/getallusers",(_, res) => {
-    User.find({}, (err, docs) => {
-        if (err) {
-            return res.status(400).json({ message: "Something went wrong" });
-        } else {
-            res.send(docs);
+router.get("/getallusers", async (req, res) => {
+    try {
+        const users = await User.find({});
+        res.send(users);
+    } catch (err) {
+        console.error("Error fetching users:", err);
+        res.status(400).json({ message: "Something went wrong" });
+    }
+});
+
+router.delete("/:id", async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
         }
-    });
+        
+        await User.findByIdAndDelete(userId);
+        res.json({ message: "User deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting user:", err);
+        res.status(400).json({ message: "Something went wrong" });
+    }
 });
 
 module.exports = router;
