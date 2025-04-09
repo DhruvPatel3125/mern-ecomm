@@ -170,3 +170,16 @@ export const deleteReview = (productId, reviewId) => async (dispatch, getState) 
     });
   }
 };
+
+// client/src/actions/productAction.jsx
+
+
+export const addProduct = (productData) => async (dispatch) => {
+  try {
+    dispatch({ type: 'ADD_PRODUCT_REQUEST' });
+    const response = await axios.post('/api/products/add', productData);
+    dispatch({ type: 'ADD_PRODUCT_SUCCESS', payload: response.data });
+  } catch (error) {
+    dispatch({ type: 'ADD_PRODUCT_FAILED', payload: error.message });
+  }
+};

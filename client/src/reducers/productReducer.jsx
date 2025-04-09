@@ -123,3 +123,16 @@ export const deleteProduct = (productId) => async (dispatch) => {
         dispatch({ type: 'DELETE_PRODUCT_FAILED', payload: error.message });
     }
 };
+
+export const addProductReducer = (state = {}, action) => {
+    switch (action.type) {
+        case 'ADD_PRODUCT_REQUEST':
+            return { loading: true };
+        case 'ADD_PRODUCT_SUCCESS':
+            return { loading: false, success: true, product: action.payload };
+        case 'ADD_PRODUCT_FAILED':
+            return { loading: false, error: action.payload };
+        default:
+            return state;
+    }
+};

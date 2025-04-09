@@ -156,4 +156,16 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// Add new route for creating a product
+router.post('/add', async (req, res) => {
+  try {
+    const product = new Product(req.body);
+    const savedProduct = await product.save();
+    res.status(201).json(savedProduct);
+  } catch (error) {
+    console.error('Error adding product:', error);
+    res.status(500).json({ message: 'Error adding product', error: error.message });
+  }
+});
+
 module.exports = router;
