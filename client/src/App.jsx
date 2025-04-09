@@ -9,6 +9,7 @@ import Loginscreen from './screens/Loginscreen';
 import OrderScreen from './screens/OrderScreen';
 import Profilescreen from './screens/Profilescreen';
 import AdminScreen from './screens/AdminScreen';
+import Editproduct from './screens/Editproduct';
 
 function App() {
   return (
@@ -23,7 +24,9 @@ function App() {
           <Route path="/login" element={<Loginscreen />} />
           <Route path="/orders" element={<OrderScreen />} />
           <Route path="/profile" element={<Profilescreen />} />
-          <Route path="/admin/*" element={<AdminScreen />} />
+          <Route path="/admin/*" element={<AdminScreen />}>
+            <Route path="editproduct/:productid" element={<Editproduct />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </div>

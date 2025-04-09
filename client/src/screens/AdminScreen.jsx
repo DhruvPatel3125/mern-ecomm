@@ -4,6 +4,7 @@ import UsersList from './UsersList';
 import ProductLists from './ProductLists';
 import AddNewProduct from './AddProduct';
 import OrdersList from './OrdersList';
+import Editproduct from './Editproduct';
 import './AdminScreen.css';
 
 export default function AdminScreen() {
@@ -61,6 +62,8 @@ export default function AdminScreen() {
                             <Route path="productslist" element={<ProductLists />} />
                             <Route path="addnewproduct" element={<AddNewProduct />} />
                             <Route path="orderslist" element={<OrdersList />} />
+                            <Route path="*" element={<h2>404 Not Found</h2>} />
+                            <Route path="editproduct/:product" element={<Editproduct />} />
                         </Routes>
                     </div>
                 </div>

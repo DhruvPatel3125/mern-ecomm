@@ -183,3 +183,17 @@ export const addProduct = (productData) => async (dispatch) => {
     dispatch({ type: 'ADD_PRODUCT_FAILED', payload: error.message });
   }
 };
+
+export const updateProductAction = (productId, updatedData) => async (dispatch) => {
+  try {
+    dispatch({ type: 'UPDATE_PRODUCT_REQUEST' });
+    const { data } = await axios.put(`/api/products/update/${productId}`, updatedData);
+    dispatch({ type: 'UPDATE_PRODUCT_SUCCESS', payload: data });
+    dispatch(getAllProducts()); // Refresh product list
+  } catch (error) {
+    dispatch({
+      type: 'UPDATE_PRODUCT_FAILED',
+      payload: error.response?.data?.message || error.message
+    });
+  }
+};

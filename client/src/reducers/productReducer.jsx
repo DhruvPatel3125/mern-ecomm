@@ -35,14 +35,14 @@ const initialSingleProductState = {
   error: null
 };
 
-export const getProductByIdReducer = (state = initialSingleProductState, action) => {
+export const getProductByIdReducer = (state = { loading: true, product: null }, action) => {
   switch (action.type) {
     case "GET_PRODUCT_REQUEST":
-      return { ...state, loading: true, error: null };
+      return { ...state, loading: true };
     case "GET_PRODUCT_SUCCESS":
-      return { ...state, loading: false, product: action.payload };
+      return { loading: false, product: action.payload };
     case "GET_PRODUCT_FAILED":
-      return { ...state, loading: false, error: action.payload };
+      return { loading: false, error: action.payload };
     default:
       return state;
   }
@@ -135,4 +135,32 @@ export const addProductReducer = (state = {}, action) => {
         default:
             return state;
     }
+};
+
+export const updateProductReducer = (state = { loading: false }, action) => {
+  switch (action.type) {
+    case 'UPDATE_PRODUCT_REQUEST':
+      return { loading: true };
+    case 'UPDATE_PRODUCT_SUCCESS':
+      return { loading: false, success: true };
+    case 'UPDATE_PRODUCT_FAILED':
+      return { loading: false, error: action.payload };
+    case 'UPDATE_PRODUCT_RESET':
+      return { loading: false };
+    default:
+      return state;
+  }
+};
+
+export const updateProduct = (productId, productData) => async (dispatch) => {
+  try {
+    dispatch({ type: 'UPDATE_PRODUCT_REQUEST' });
+    const { data } = await axios.put(`/api/products/update/${productId}`, productData);
+    dispatch({ type: 'UPDATE_PRODUCT_SUCCESS', payload: data });
+  } catch (error) {
+    dispatch({
+      type: 'UPDATE_PRODUCT_FAILED',
+      payload: error.response?.data?.message || error.message
+    });
+  }
 };

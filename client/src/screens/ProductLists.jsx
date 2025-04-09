@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Button, Image } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
 import { getAllProducts } from '../reducers/productReducer';
 import { deleteProduct } from '../reducers/productReducer';
 
 export default function ProductLists() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { products, loading, error } = useSelector((state) => state.allProducts);
   const { loading: deleteLoading, error: deleteError, success: deleteSuccess } = useSelector((state) => state.deleteProduct);
@@ -32,10 +34,10 @@ export default function ProductLists() {
   if (deleteError) return <Error error={deleteError} />;
 
   return (
-    <div>
-      <h2>Products List</h2>
-      <Table striped bordered hover responsive className="mt-3">
-        <thead>
+    <div style={{ padding: '20px' }}>
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Products List</h2>
+      <Table striped bordered hover responsive className="mt-3" style={{ fontSize: '14px' }}>
+        <thead style={{ backgroundColor: '#f8f9fa' }}>
           <tr>
             <th>Product ID</th>
             <th>Image</th>
@@ -55,7 +57,7 @@ export default function ProductLists() {
                 <Image 
                   src={product.image} 
                   alt={product.name} 
-                  style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                  style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '5px' }} 
                 />
               </td>
               <td>{product.name}</td>
@@ -68,8 +70,16 @@ export default function ProductLists() {
                   variant="danger" 
                   size="sm"
                   onClick={() => handleDeleteProduct(product._id)}
+                  style={{ marginRight: '5px' }}
                 >
                   Delete
+                </Button>
+                <Button 
+                  variant="primary" 
+                  size="sm"
+                  onClick={() => navigate(`/admin/editproduct/${product._id}`)}
+                >
+                  Edit
                 </Button>
               </td>
             </tr>

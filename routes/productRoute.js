@@ -16,19 +16,21 @@ router.get('/getallproducts', (req, res) => {
 // Add the getproductbyid route
 router.get('/getproductbyid/:id', async (req, res) => {
   try {
-    console.log("Received request for product ID:", req.params.id);
-    const product = await Product.findById(req.params.id);
+    const productId = req.params.id;
+    console.log("Fetching product with ID:", productId);
+    
+    const product = await Product.findById(productId);
     
     if (!product) {
       console.log("Product not found");
       return res.status(404).json({ message: 'Product not found' });
     }
     
-    console.log("Found product:", product);
+    console.log("Product found:", product);
     res.json(product);
   } catch (error) {
-    console.error("Error in getproductbyid:", error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Error fetching product:", error);
+    res.status(500).json({ message: 'Error fetching product', error: error.message });
   }
 });
 
@@ -165,6 +167,30 @@ router.post('/add', async (req, res) => {
   } catch (error) {
     console.error('Error adding product:', error);
     res.status(500).json({ message: 'Error adding product', error: error.message });
+  }
+});
+
+// Add update product endpoint
+router.put('/update/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    console.log('Updating product:', id, updates);
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    Object.keys(updates).forEach((key) => {
+      product[key] = updates[key];
+    });
+
+    await product.save();
+    res.status(200).json(product);
+  } catch (error) {
+    console.error('Update error:', error);
+    res.status(500).json({ message: 'Error updating product', error: error.message });
   }
 });
 
