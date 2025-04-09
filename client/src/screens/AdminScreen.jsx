@@ -4,6 +4,7 @@ import UsersList from './UsersList';
 import ProductLists from './ProductLists';
 import AddNewProduct from './AddProduct';
 import OrdersList from './OrdersList';
+import './AdminScreen.css';
 
 export default function AdminScreen() {
     const navigate = useNavigate();
@@ -17,35 +18,43 @@ export default function AdminScreen() {
     }, [location, navigate]);
 
     return (
-        <div>
-            <div className="row justify-content-center mt-5"> 
-                <div className="col-md-10">
-                    <div className="admin-menu">
-                        <ul className='admin p-2' style={{ listStyleType: 'none', padding: 0 }}>
-                            <li style={{ marginBottom: '10px' }}>
-                                <Link to="/admin/userslist" className={`admin-link ${location.pathname.includes('/admin/userslist') ? 'active' : ''}`}>
-                                    Users List
-                                </Link>
-                            </li>
-                            <li style={{ marginBottom: '10px' }}>
-                                <Link to="/admin/productslist" className={`admin-link ${location.pathname.includes('/admin/productslist') ? 'active' : ''}`}>
-                                    Products List
-                                </Link>
-                            </li>
-                            <li style={{ marginBottom: '10px' }}>
-                                <Link to="/admin/addnewproduct" className={`admin-link ${location.pathname.includes('/admin/addnewproduct') ? 'active' : ''}`}>
-                                    Add New Product
-                                </Link>
-                            </li>
-                            <li style={{ marginBottom: '10px' }}>
-                                <Link to="/admin/orderslist" className={`admin-link ${location.pathname.includes('/admin/orderslist') ? 'active' : ''}`}>
-                                    Orders List
-                                </Link>
-                            </li>
-                        </ul>
+        <div className="admin-dashboard">
+            <div className="admin-container">
+                <div className="admin-sidebar">
+                    <div className="admin-logo">
+                        <h2>Admin Panel</h2>
                     </div>
+                    <ul className="admin-menu">
+                        <li>
+                            <Link to="/admin/userslist" className={`admin-menu-item ${location.pathname.includes('/admin/userslist') ? 'active' : ''}`}>
+                                <i className="fas fa-users"></i>
+                                <span>Users List</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/admin/productslist" className={`admin-menu-item ${location.pathname.includes('/admin/productslist') ? 'active' : ''}`}>
+                                <i className="fas fa-box"></i>
+                                <span>Products List</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/admin/addnewproduct" className={`admin-menu-item ${location.pathname.includes('/admin/addnewproduct') ? 'active' : ''}`}>
+                                <i className="fas fa-plus-circle"></i>
+                                <span>Add Product</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/admin/orderslist" className={`admin-menu-item ${location.pathname.includes('/admin/orderslist') ? 'active' : ''}`}>
+                                <i className="fas fa-shopping-cart"></i>
+                                <span>Orders List</span>
+                            </Link>
+                        </li>
+                    </ul>
+                </div>
 
-                    <div className="admin-content mt-4">
+                <div className="admin-main-content">
+        
+                    <div className="admin-content">
                         <Routes>
                             <Route path="/" element={<UsersList />} />
                             <Route path="userslist" element={<UsersList />} />
