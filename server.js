@@ -1,11 +1,6 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const path = require('path');
-
-// Load env variables
-dotenv.config();
 
 // Middleware to parse JSON
 app.use(express.json()); 
@@ -29,14 +24,7 @@ app.get("/", (req, res) => {
 });
 
 // Server listening
-const port = process.env.PORT || 8000;
+const port = 5000;
 app.listen(port, () => {
-    console.log(`Server running on port ${port} in ${process.env.NODE_ENV} mode`);
+    console.log(`Server is running on port ${port}`);
 });
-
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '/client/build')));
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'client/build/index.html'));
-    });
-}
