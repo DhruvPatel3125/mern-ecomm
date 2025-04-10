@@ -12,6 +12,7 @@ require('./db');
 const productRoute = require('./routes/productRoute');
 const userRoute = require("./routes/userRoute");
 const orderRout = require('./routes/orderRout')
+const path = require('path')
 
 // Use routes
 app.use('/api/products', productRoute);
@@ -24,7 +25,12 @@ app.get("/", (req, res) => {
 });
 
 // Server listening
-const port = 5000;
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+const port = process.env.PORT || 8000;
+app.listen(port,()=> console.log(`node js server started`))
+
+if(process.env.NODE_ENV === 'production'){ 
+    app.use(express.static(path.join(__dirname,'/client/build')))
+    app.get('*',(req,res)=>{
+        res.sendFile(path.resolve(__dirname,'client/build/index.html'))
+    })
+}
