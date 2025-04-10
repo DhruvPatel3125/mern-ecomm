@@ -28,3 +28,16 @@ export const placeholder = (token, subtotal) => (dispatch, getState) => {
       dispatch({ type: "PLACE_ORDER_FAILED" });
     });
 };
+
+export const getAllOrders = () => async (dispatch) => {
+    try {
+        dispatch({ type: 'GET_ALL_ORDERS_REQUEST' });
+        const { data } = await axios.get('/api/orders/getallorders');
+        dispatch({ type: 'GET_ALL_ORDERS_SUCCESS', payload: data });
+    } catch (error) {
+        dispatch({
+            type: 'GET_ALL_ORDERS_FAILED',
+            payload: error.response?.data?.message || error.message
+        });
+    }
+};

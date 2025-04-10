@@ -80,4 +80,16 @@ router.post("/placeorder", async (req, res) => {
   }
 });
 
+router.get("/getallorders", async (req, res) => {
+  try {
+    const orders = await Order.find({}).sort({ createdAt: -1 });
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(400).json({
+      message: "Something went wrong",
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
