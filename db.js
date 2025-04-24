@@ -6,8 +6,7 @@ const mongoDBURL = process.env.MONGO_URI || "mongodb+srv://dhruv:402125@cluster0
 const connectDB = async () => {
     try {
         await mongoose.connect(mongoDBURL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
+            
         });
         console.log("MongoDB Connection Successful ✅");
     } catch (error) {
