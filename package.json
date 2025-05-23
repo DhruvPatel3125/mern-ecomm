@@ -10,6 +10,7 @@
   "description": "",
   "dependencies": {
     "@redux-devtools/extension": "^3.3.0",
+    "@stripe/stripe-js": "^7.3.0",
     "axios": "^1.8.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

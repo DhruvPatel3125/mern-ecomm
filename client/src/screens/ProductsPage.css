@@ -1,0 +1,188 @@
+.products-page {
+    padding: 20px 0;
+}
+
+.filters-sidebar {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    height: fit-content;
+}
+
+.filter-section {
+    margin-bottom: 25px;
+}
+
+.filter-section h4 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #333;
+}
+
+.category-item {
+    margin-bottom: 10px;
+}
+
+.category-item label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.category-item input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.list-view .product {
+    display: flex;
+    align-items: center;
+}
+
+.list-view .product img {
+    max-width: 200px;
+    margin-right: 20px;
+}
+
+.list-view .product-details {
+    flex: 1;
+}
+
+.view-toggle-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.price-range-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.sort-select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-card {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.filters-sidebar {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Enhanced Hover Effects */
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Loading Skeleton Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.loading-skeleton {
+    background: linear-gradient(90deg, 
+        #f0f0f0 25%, 
+        #e0e0e0 50%, 
+        #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Filter Transitions */
+.filter-section {
+    transition: all 0.3s ease;
+}
+
+.filter-section:hover {
+    transform: translateX(5px);
+}
+
+/* Sort/Filter Buttons */
+.sort-select, 
+.filter-button {
+    transition: all 0.2s ease;
+}
+
+.sort-select:hover, 
+.filter-button:hover {
+    border-color: #007bff;
+}
+
+/* View Toggle Buttons */
+.view-toggle-button {
+    transition: all 0.2s ease;
+}
+
+.view-toggle-button:hover {
+    transform: scale(1.1);
+}
+
+/* Empty State Animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.empty-state {
+    animation: pulse 2s infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .filters-sidebar {
+        margin-bottom: 20px;
+    }
+
+    .list-view .product {
+        flex-direction: column;
+    }
+
+    .list-view .product img {
+        max-width: 100%;
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .filters-sidebar {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .filters-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .filters-sidebar.closed {
+        transform: translateX(-100%);
+    }
+}
