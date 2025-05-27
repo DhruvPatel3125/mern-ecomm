@@ -1,5 +1,4 @@
 import React from 'react'
-import StripeCheckout from "react-stripe-checkout"
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 
@@ -11,76 +10,111 @@ export default function Checkout({ amount }) {
     // Make sure we have a valid amount and it's greater than zero
     const finalAmount = Math.max(1, Math.round(amount * 100)); // Minimum 1 (1 paise)
     
-    const tokenHandler = async (token) => {
+    // Razorpay script loader
+    const loadRazorpayScript = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    const displayRazorpay = async () => {
+        const res = await loadRazorpayScript();
+
+        if (!res) {
+            alert('Razorpay SDK failed to load. Are you online?');
+            return;
+        }
+
+        // Make sure cart is not empty before creating order
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        if (!cartItems.length) {
+             alert("Your cart is empty");
+             return;
+        }
+
+        // Call backend to create order
         try {
-            console.log("Token received:", token); // Debug token
-            
-            dispatch({ type: 'PLACE_ORDER_REQUEST' });
-            
-            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-            
-            // Make sure cart is not empty
-            if (!cartItems.length) {
-                throw new Error("Your cart is empty");
-            }
-            
-            const response = await axios.post('/api/orders/placeorder', {
-                token,
-                subtotal: amount,
-                currentUser,
-                cartItems
+            dispatch({ type: 'PLACE_ORDER_REQUEST' }); // Indicate order process start
+
+            const { data: order } = await axios.post('/api/orders/create-order', {
+                amount: amount * 100, // Razorpay expects amount in paise
+                currency: 'INR',
+                receipt: `receipt_${Date.now()}`, // Simple unique receipt
             });
-            
-            console.log('Payment Success:', response.data);
-            
-            dispatch({ type: 'PLACE_ORDER_SUCCESS' });
-            
-            // Clear cart after successful order
-            localStorage.removeItem('cartItems');
-            dispatch({ type: 'DELETE_FROM_CART', payload: [] });
-            
-            // Show success message
-            alert('Payment Successful! Your order has been placed.');
-            
-            // Redirect to home or order confirmation page
-            window.location.href = '/';
-            
+
+            const options = {
+                key: 'rzp_test_Dz9hd6AMtKfCZE', // Replace with your test key ID
+                amount: order.amount,
+                currency: order.currency,
+                order_id: order.id,
+                name: 'Shay Shop',
+                description: `Payment for Order ID: ${order.id}`,
+                image: 'your_logo_url', // Replace with your logo URL if you have one
+                handler: async function (response) {
+                    // Payment successful, verify signature on backend
+                    try {
+                        const verificationResponse = await axios.post('/api/orders/verify-payment', {
+                            order_id: response.razorpay_order_id,
+                            payment_id: response.razorpay_payment_id,
+                            signature: response.razorpay_signature,
+                        });
+
+                        if (verificationResponse.status === 200) {
+                            console.log('Payment Success:', verificationResponse.data);
+                            dispatch({ type: 'PLACE_ORDER_SUCCESS' });
+                            // Clear cart after successful order
+                            localStorage.removeItem('cartItems');
+                            dispatch({ type: 'DELETE_FROM_CART', payload: [] });
+                            alert('Payment Successful! Your order has been placed.');
+                            window.location.href = '/'; // Redirect on success
+                        } else {
+                            console.error('Payment Verification Failed:', verificationResponse.data);
+                            dispatch({ type: 'PLACE_ORDER_FAILED', payload: 'Payment verification failed' });
+                            alert('Payment verification failed. Please contact support.');
+                        }
+                    } catch (error) {
+                        console.error('Payment Verification Error:', error);
+                        dispatch({ type: 'PLACE_ORDER_FAILED', payload: 'Error verifying payment' });
+                        alert('An error occurred during payment verification.');
+                    }
+                },
+                prefill: {
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    contact: currentUser.contact || '', // Assuming user model has a contact field or add one
+                },
+                notes: {
+                    address: 'User Address', // Add user address details if available
+                },
+                theme: {
+                    color: '#3399cc',
+                },
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+
         } catch (error) {
-            console.error('Payment Error:', error);
-            
-            // Get the most useful error message
-            const errorMessage = 
-                error.response?.data?.error || 
-                error.response?.data?.message || 
-                error.message || 
-                'Payment failed. Please try again.';
-                
+            console.error('Error creating Razorpay order:', error);
+            const errorMessage =
+                error.response?.data?.error ||
+                error.response?.data?.message ||
+                error.message ||
+                'Failed to create Razorpay order. Please try again.';
+
             dispatch({ type: 'PLACE_ORDER_FAILED', payload: errorMessage });
-            
-            alert(`Payment failed: ${errorMessage}`);
+            alert(`Order creation failed: ${errorMessage}`);
         }
     };
 
     return (
         <div>
             {currentUser ? (
-                <StripeCheckout
-                    amount={finalAmount}
-                    shippingAddress
-                    token={tokenHandler}
-                    stripeKey="pk_test_51R4FemRte5P3YdHuiiZoB5xBJwXw1Libwr90Kc65VI8da4VNydkgeDYnh4tnODltuuOhn06P6zzDl2a6VC4CHg9700UGwrazmY"
-                    currency="INR"
-                    name="Shay Shop"
-                    description={`Your total is ₹${amount}`}
-                    email={currentUser.email}
-                    billingAddress={true}
-                    zipCode={true}
-                    allowRememberMe={true}
-                    reconfigureOnUpdate={false}
-                    // Test card: use 4242 4242 4242 4242, any future date, any 3 digits for CVC, any 5 digits for postal
-                >
-                    <button className="btn">Pay Now ₹{amount}</button>
-                </StripeCheckout>
+                <button className="btn" onClick={displayRazorpay}>Pay Now ₹{amount}</button>
             ) : (
                 <div>
                     <p>Please login to checkout</p>
