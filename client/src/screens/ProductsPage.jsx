@@ -16,7 +16,7 @@ export default function ProductsPage() {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const getAllProductsState = useSelector(state => state.getAllProductsReducer);
+    const getAllProductsState = useSelector(state => state.allProducts);
     const { loading, products, error } = getAllProductsState;
 
     useEffect(() => {

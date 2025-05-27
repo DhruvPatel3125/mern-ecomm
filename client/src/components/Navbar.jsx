@@ -88,11 +88,11 @@ const Navbar = () => {
                       <i className="fas fa-user me-2"></i>Profile
                     </Link>
                   </li>
-                  <li>
+                  {/* <li>
                     <Link className="dropdown-item" to="/orders">
                       <i className="fas fa-box me-2"></i>Orders
                     </Link>
-                  </li>
+                  </li> */}
                   <li><hr className="dropdown-divider" /></li>
                   <li>
                     <button className="dropdown-item" onClick={handleLogout}>

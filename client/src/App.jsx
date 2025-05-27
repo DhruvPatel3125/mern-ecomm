@@ -10,6 +10,8 @@ import OrderScreen from './screens/OrderScreen';
 import Profilescreen from './screens/Profilescreen';
 import AdminScreen from './screens/AdminScreen';
 import Editproduct from './screens/Editproduct';
+import UserOrdersScreen from './screens/UserOrdersScreen';
+import ProductsPage from './screens/ProductsPage';
 
 function App() {
   return (
@@ -19,11 +21,13 @@ function App() {
         <Routes>
           <Route path="/" element={<Homescreen />} />
           <Route path="/product/:id" element={<ProductDescription />} />
+          <Route path="/products" element={<ProductsPage />} />
           <Route path="/cart" element={<Cartscreen />} />
           <Route path="/register" element={<Registerscreen />} />
           <Route path="/login" element={<Loginscreen />} />
-          <Route path="/orders" element={<OrderScreen />} />
+          <Route path="/order/:id" element={<OrderScreen />} />
           <Route path="/profile" element={<Profilescreen />} />
+          <Route path="/orders" element={<UserOrdersScreen />} />
           <Route path="/admin/*" element={<AdminScreen />}>
             <Route path="editproduct/:productid" element={<Editproduct />} />
           </Route>

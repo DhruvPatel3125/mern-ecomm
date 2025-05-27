@@ -4,7 +4,6 @@ import { getAllProducts } from "../actions/productAction";
 import Product from "../components/Product";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
-import Filter from "../components/Filter";
 
 export default function Homescreen() {
   const dispatch = useDispatch();
@@ -21,7 +20,6 @@ export default function Homescreen() {
 
   return (
     <div className="container mt-4">
-      <Filter/>
       {loading ? (
         <div className="loading-spinner">
           <Loader />

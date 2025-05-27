@@ -65,12 +65,52 @@ export default function Checkout({ amount }) {
 
                         if (verificationResponse.status === 200) {
                             console.log('Payment Success:', verificationResponse.data);
-                            dispatch({ type: 'PLACE_ORDER_SUCCESS' });
-                            // Clear cart after successful order
-                            localStorage.removeItem('cartItems');
-                            dispatch({ type: 'DELETE_FROM_CART', payload: [] });
-                            alert('Payment Successful! Your order has been placed.');
-                            window.location.href = '/'; // Redirect on success
+                            
+                            // Now, place the order in your database
+                            try {
+                                // Get cart items and user info
+                                const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+                                const userState = JSON.parse(localStorage.getItem('currentUser')); // Assuming user info is in localStorage
+                                // You might need to adjust how you get user info if it's not in localStorage
+
+                                if (!userState || !userState._id) {
+                                    throw new Error("User information not available.");
+                                }
+
+                                const orderPlacementResponse = await axios.post('/api/orders/placeorder', {
+                                    currentUser: userState,
+                                    cartItems: cartItems,
+                                    subtotal: amount, // Use the original amount
+                                    transactionId: response.razorpay_payment_id, // Pass the Razorpay payment ID
+                                });
+
+                                console.log('Order Placed:', orderPlacementResponse.data);
+
+                                dispatch({ type: 'PLACE_ORDER_SUCCESS' });
+                                // Clear cart after successful order placement
+                                localStorage.removeItem('cartItems');
+                                dispatch({ type: 'DELETE_FROM_CART', payload: [] });
+
+                                alert('Payment Successful! Your order has been placed.');
+                                
+                                // Redirect to the order details page
+                                // Assuming the backend returns orderId in the response
+                                const orderId = orderPlacementResponse.data.orderId;
+                                if (orderId) {
+                                    window.location.href = `/order/${orderId}`;
+                                } else {
+                                    // Fallback redirect if orderId is not returned
+                                    window.location.href = '/';
+                                }
+
+                            } catch (orderError) {
+                                console.error('Error placing order after verification:', orderError);
+                                dispatch({ type: 'PLACE_ORDER_FAILED', payload: 'Error placing order' });
+                                alert(`Payment successful, but failed to place order: ${orderError.message}`);
+                                // Consider redirecting to an error page or showing a message
+                                window.location.href = '/'; // Redirect to home or an error page
+                            }
+
                         } else {
                             console.error('Payment Verification Failed:', verificationResponse.data);
                             dispatch({ type: 'PLACE_ORDER_FAILED', payload: 'Payment verification failed' });

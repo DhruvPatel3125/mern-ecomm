@@ -2,6 +2,7 @@ import React from 'react'
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import './OrderScreen.css';
 
 export default function OrderScreen() {
     const { id } = useParams();
@@ -32,21 +33,34 @@ export default function OrderScreen() {
     if (error) return <div>Error: {error}</div>;
 
     return (
-        <div>
+        <div className="order-details-container">
             <h1>Order Details</h1>
             {order && (
                 <>
                     <p><strong>Order ID:</strong> {order._id}</p>
-                    <p><strong>Customer:</strong> {order.customerName}</p>
-                    <p><strong>Total:</strong> ${order.totalPrice}</p>
+                    <p><strong>Customer:</strong> {order.name}</p>
+                    <p><strong>Total:</strong> ₹{order.orderAmount}</p>
                     <h2>Items</h2>
                     <ul>
-                        {order.items.map((item) => (
-                            <li key={item.productId}>
-                                {item.name} - {item.quantity} x ${item.price}
+                        {order.orderItems.map((item, index) => (
+                            <li key={item._id || item.productId || index}>
+                                {item.name} - {item.quantity} x ₹{item.price}
                             </li>
                         ))}
                     </ul>
+                    {order.shippingAddress && (
+                        <div>
+                            <h3>Shipping Address</h3>
+                            <p><strong>Address:</strong> {order.shippingAddress.address}</p>
+                            <p><strong>City:</strong> {order.shippingAddress.city}</p>
+                            <p><strong>Postal Code:</strong> {order.shippingAddress.postalCode}</p>
+                            <p><strong>Country:</strong> {order.shippingAddress.country}</p>
+                        </div>
+                    )}
+                    {order.transactionId && (
+                         <p><strong>Transaction ID:</strong> {order.transactionId}</p>
+                    )}
+                     <p><strong>Delivery Status:</strong> {order.isDelivered ? 'Delivered' : 'Pending'}</p>
                 </>
             )}
         </div>

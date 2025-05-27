@@ -1,0 +1,23 @@
+.orders-table {
+    margin-top: 20px;
+}
+
+.orders-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.orders-table td,
+.orders-table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.orders-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.orders-table .badge {
+    padding: 0.4em 0.6em;
+    font-size: 85%;
+} 
