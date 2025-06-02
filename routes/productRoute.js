@@ -193,5 +193,4 @@ router.put('/update/:id', async (req, res) => {
     res.status(500).json({ message: 'Error updating product', error: error.message });
   }
 });
-//product router
 module.exports = router;
