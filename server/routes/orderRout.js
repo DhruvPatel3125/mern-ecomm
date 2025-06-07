@@ -6,8 +6,8 @@ const orderModel = require("../models/orderModel"); // Import the order model
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
-  key_id: "rzp_test_Dz9hd6AMtKfCZE", // Replace with your test key ID
-  key_secret: "rw9XkYczC8zyof55ca2LAT6z", // Replace with your test key secret
+  key_id: process.env.RZP_KEY_ID, // Replace with your test key ID
+  key_secret: process.env.RZP_KEY_SEC, // Replace with your test key secret
 });
 
 // Add Razorpay routes
@@ -33,7 +33,7 @@ router.post("/verify-payment", async (req, res) => {
 
   const crypto = require("crypto");
 
-  const shasum = crypto.createHmac("sha256", "rw9XkYczC8zyof55ca2LAT6z"); // Use your test key secret
+  const shasum = crypto.createHmac("sha256", process.env.RZP_KEY_SEC); // Use your test key secret
   shasum.update(`${order_id}|${payment_id}`);
   const digest = shasum.digest("hex");
 
