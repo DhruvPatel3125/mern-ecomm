@@ -6,6 +6,7 @@
     "@redux-devtools/extension": "^3.3.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
+    "cloudinary": "^1.21.0",
     "cra-template": "1.2.0",
     "font-awesome": "^4.7.0",
     "moment": "^2.30.1",
