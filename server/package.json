@@ -12,6 +12,7 @@
   "dependencies": {
     "@redux-devtools/extension": "^3.3.0",
     "axios": "^1.8.3",
+    "cros": "^1.1.0",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "mongoose": "^8.9.5",
