@@ -2,25 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const cors = require('cors'); // Import cors
 
 // Middleware to parse JSON
 app.use(express.json()); 
-
-// CORS Configuration
-const allowedOrigins = ['https://shy-shop-git-main-dhruvs-projects-7db11567.vercel.app', 'http://localhost:3000']; // Add your Vercel frontend URL and localhost for development
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  }
-}));
 
 // Database connection
 require('./db');
