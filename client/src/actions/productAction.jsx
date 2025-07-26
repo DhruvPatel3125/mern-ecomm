@@ -1,9 +1,11 @@
 import axios from "axios";
 
+const API = axios.create({ baseURL: process.env.REACT_APP_API_URL });
+
 export const getAllProducts = () => async (dispatch) => {
   try {
     dispatch({ type: "GET_PRODUCTS_REQUEST" });
-    const response = await axios.get("/api/products/getallproducts");
+    const response = await API.get("/api/products/getallproducts");
     dispatch({ type: "GET_PRODUCTS_SUCCESS", payload: response.data });
   } catch (error) {
     dispatch({ type: "GET_PRODUCTS_FAILED", payload: error.message });
@@ -13,7 +15,7 @@ export const getAllProducts = () => async (dispatch) => {
 export const getProductById = (productId) => async (dispatch) => {
   try {
     dispatch({ type: "GET_PRODUCT_REQUEST" });
-    const response = await axios.get(`/api/products/getproductbyid/${productId}`);
+    const response = await API.get(`/api/products/getproductbyid/${productId}`);
     dispatch({ type: "GET_PRODUCT_SUCCESS", payload: response.data });
   } catch (error) {
     dispatch({ type: "GET_PRODUCT_FAILED", payload: error.message });
@@ -52,7 +54,7 @@ export const addtocart = (product, quantity) => (dispatch, getState) => {
 
 export const filterProducts = (searchkey, shortKey, category) => (dispatch) => {
   dispatch({ type: 'GET_PRODUCTS_REQUEST' });
-  axios.get('/api/products/getallproducts').then((res) => {
+  API.get('/api/products/getallproducts').then((res) => {
     let filteredproducts = res.data;
 
     if (searchkey) {
@@ -88,7 +90,7 @@ export const addproductReview = (review, productid) => async (dispatch, getState
       throw new Error('Please login to submit a review');
     }
 
-    const response = await axios.post('/api/products/addreview', {
+    const response = await API.post('/api/products/addreview', {
       review,
       productid,
       currentUser
@@ -124,7 +126,7 @@ export const editReview = (productId, reviewId, updatedReview) => async (dispatc
       }
     };
 
-    const response = await axios.put(
+    const response = await API.put(
       `/api/products/${productId}/reviews/${reviewId}`,
       {
         ...updatedReview,
@@ -157,7 +159,7 @@ export const deleteReview = (productId, reviewId) => async (dispatch, getState) 
       data: { userid: currentUser._id }
     };
 
-    await axios.delete(`/api/products/${productId}/reviews/${reviewId}`, config);
+    await API.delete(`/api/products/${productId}/reviews/${reviewId}`, config);
 
     dispatch({ type: 'DELETE_REVIEW_SUCCESS' });
     // Refresh product details
@@ -177,7 +179,7 @@ export const deleteReview = (productId, reviewId) => async (dispatch, getState) 
 export const addProduct = (productData) => async (dispatch) => {
   try {
     dispatch({ type: 'ADD_PRODUCT_REQUEST' });
-    const response = await axios.post('/api/products/add', productData);
+    const response = await API.post('/api/products/add', productData);
     dispatch({ type: 'ADD_PRODUCT_SUCCESS', payload: response.data });
   } catch (error) {
     dispatch({ type: 'ADD_PRODUCT_FAILED', payload: error.message });
@@ -187,7 +189,7 @@ export const addProduct = (productData) => async (dispatch) => {
 export const updateProductAction = (productId, updatedData) => async (dispatch) => {
   try {
     dispatch({ type: 'UPDATE_PRODUCT_REQUEST' });
-    const { data } = await axios.put(`/api/products/update/${productId}`, updatedData);
+    const { data } = await API.put(`/api/products/update/${productId}`, updatedData);
     dispatch({ type: 'UPDATE_PRODUCT_SUCCESS', payload: data });
     dispatch(getAllProducts()); // Refresh product list
   } catch (error) {

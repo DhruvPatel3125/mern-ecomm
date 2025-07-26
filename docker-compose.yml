@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  server:
+    build: ./server
+    ports:
+      - "5000:5000"
+    env_file: .env
+    environment:
+      - PORT=5000
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./server:/app
+    # For development, uncomment the next line:
+    # command: nodemon server.js
+    stdin_open: true
+    tty: true
+
+  client:
+    build: ./client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    working_dir: /app
+    volumes:
+      - ./client:/app
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+    # For development, uncomment the next line:
+    # command: npm start
+    stdin_open: true
+    tty: true
+

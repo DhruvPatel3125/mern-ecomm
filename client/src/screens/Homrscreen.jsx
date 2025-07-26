@@ -7,12 +7,8 @@ import Error from "../components/Error";
 
 export default function Homescreen() {
   const dispatch = useDispatch();
-  
-  // Add console.log to debug Redux state
   const productState = useSelector((state) => state.allProducts);
   const { loading, products, error } = productState;
-  
-  console.log("Redux State:", { productState, loading, products, error });
 
   useEffect(() => {
     dispatch(getAllProducts());
@@ -26,11 +22,11 @@ export default function Homescreen() {
         </div>
       ) : error ? (
         <div className="error-message">
-          <Error error = "Something went Wrong..."/>
+          <Error error="Something went Wrong..." />
         </div>
       ) : (
         <div className="row">
-          {products && products.length > 0 ? (
+          {Array.isArray(products) && products.length > 0 ? (
             products.map((product) => (
               <div className="col-md-3 mb-4" key={product._id}>
                 <Product product={product} />
