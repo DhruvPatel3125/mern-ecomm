@@ -31,14 +31,48 @@ export const placeholder = (token, subtotal) => (dispatch, getState) => {
 
 export const getAllOrders = () => async (dispatch) => {
     try {
+        console.log('Fetching all orders...');
         dispatch({ type: 'GET_ALL_ORDERS_REQUEST' });
         const { data } = await axios.get('/api/orders/getallorders');
+        console.log('Orders fetched successfully:', data);
         dispatch({ type: 'GET_ALL_ORDERS_SUCCESS', payload: data });
     } catch (error) {
+        console.error('Error fetching orders:', error);
+        console.error('Error response:', error.response);
         dispatch({
             type: 'GET_ALL_ORDERS_FAILED',
             payload: error.response?.data?.message || error.message
         });
     }
 };
-//oder details
+// Mark order as delivered
+export const markOrderDelivered = (orderId) => async (dispatch) => {
+    try {
+        dispatch({ type: 'MARK_ORDER_DELIVERED_REQUEST' });
+        const { data } = await axios.put(`/api/orders/delivered/${orderId}`);
+        dispatch({ type: 'MARK_ORDER_DELIVERED_SUCCESS', payload: data });
+        // Refresh orders list after marking as delivered
+        dispatch(getAllOrders());
+    } catch (error) {
+        dispatch({
+            type: 'MARK_ORDER_DELIVERED_FAILED',
+            payload: error.response?.data?.message || error.message
+        });
+    }
+};
+
+// Get user orders
+export const getUserOrders = (userId) => async (dispatch) => {
+    try {
+        dispatch({ type: 'GET_USER_ORDERS_REQUEST' });
+        const { data } = await axios.get(`/api/orders/user/${userId}`);
+        dispatch({ type: 'GET_USER_ORDERS_SUCCESS', payload: data });
+    } catch (error) {
+        dispatch({
+            type: 'GET_USER_ORDERS_FAILED',
+            payload: error.response?.data?.message || error.message
+        });
+    }
+};
+
+//order details

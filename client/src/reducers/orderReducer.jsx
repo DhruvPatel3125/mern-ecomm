@@ -31,3 +31,29 @@ export const getAllOrdersReducer = (state = { orders: [], loading: false }, acti
             return state;
     }
 };
+
+export const markOrderDeliveredReducer = (state = {}, action) => {
+    switch (action.type) {
+        case 'MARK_ORDER_DELIVERED_REQUEST':
+            return { loading: true };
+        case 'MARK_ORDER_DELIVERED_SUCCESS':
+            return { loading: false, success: true };
+        case 'MARK_ORDER_DELIVERED_FAILED':
+            return { loading: false, error: action.payload };
+        default:
+            return state;
+    }
+};
+
+export const getUserOrdersReducer = (state = { orders: [], loading: false }, action) => {
+    switch (action.type) {
+        case 'GET_USER_ORDERS_REQUEST':
+            return { ...state, loading: true };
+        case 'GET_USER_ORDERS_SUCCESS':
+            return { loading: false, orders: action.payload };
+        case 'GET_USER_ORDERS_FAILED':
+            return { loading: false, error: action.payload };
+        default:
+            return state;
+    }
+};

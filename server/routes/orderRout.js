@@ -44,23 +44,54 @@ router.post("/verify-payment", async (req, res) => {
   }
 });
 
-// Add route to get a single order by ID
-router.get("/:id", async (req, res) => {
-  const orderId = req.params.id;
-
+// Test route to check database connection (MUST come before /:id route)
+router.get("/test", async (req, res) => {
   try {
-    // Assuming your order model is imported and named 'orderModel'
-    // You might need to add 'const orderModel = require("../models/orderModel");' at the top if not already there.
-    const orderModel = require("../models/orderModel"); // Ensure model is imported
-    const order = await orderModel.findById(orderId);
-
-    if (order) {
-      res.status(200).json(order);
-    } else {
-      res.status(404).json({ message: "Order not found. Please check the order ID and try again." });
-    }
+    console.log("Testing database connection...");
+    const testQuery = await orderModel.countDocuments();
+    console.log("Database connection successful. Order count:", testQuery);
+    res.status(200).json({ 
+      message: "Database connection successful", 
+      orderCount: testQuery,
+      model: "orderModel is working",
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Database connection test failed:', error);
+    res.status(500).json({ 
+      message: 'Database connection failed', 
+      error: error.message 
+    });
+  }
+});
+
+// Add route to get all orders
+router.get("/getallorders", async (req, res) => {
+  try {
+    console.log("Attempting to fetch all orders from database.");
+    
+    // First check if we can connect to the database
+    const orderCount = await orderModel.countDocuments();
+    console.log("Total orders in database:", orderCount);
+    
+    if (orderCount === 0) {
+      console.log("No orders found in database");
+      return res.status(200).json([]);
+    }
+    
+    const orders = await orderModel.find({}).sort({ createdAt: -1 }).lean();
+    console.log("Fetched orders count:", orders.length);
+    console.log("Sample order:", orders[0]);
+    
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      message: 'Failed to fetch orders', 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
@@ -99,34 +130,87 @@ router.post("/placeorder", async (req, res) => {
   }
 });
 
-// Add route to get all orders
-router.get("/getallorders", async (req, res) => {
-  try {
-    const orderModel = require("../models/orderModel"); // Ensure model is imported if not already
-    console.log("Attempting to fetch all orders from database."); // Log start of fetch
-    const orders = await orderModel.find({});
-    console.log("Fetched orders:", orders); // Log fetched orders
-    res.status(200).json(orders);
-  } catch (error) {
-    console.error('Error fetching all orders:', error); // Log the actual error
-    res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
-  }
-});
-
 // Add route to get orders for a specific user
 router.get("/userorders", async (req, res) => {
   try {
     // Assuming user information is available in req.user after authentication
     const userId = req.user._id; 
-    const orderModel = require("../models/orderModel"); // Ensure model is imported
 
     // Find orders where the userId matches the logged-in user's ID
-    const userOrders = await orderModel.find({ userId: userId });
+    const userOrders = await orderModel.find({ userId: userId }).sort({ createdAt: -1 });
 
     res.status(200).json(userOrders);
   } catch (error) {
     console.error('Error fetching user orders:', error);
     res.status(500).json({ message: 'Failed to fetch user orders', error: error.message });
+  }
+});
+
+// Add route to mark order as delivered
+router.put("/delivered/:id", async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    // Find the order and update its delivery status
+    const order = await orderModel.findByIdAndUpdate(
+      orderId,
+      { 
+        isDelivered: true,
+        deliveredAt: new Date()
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    console.log(`Order ${orderId} marked as delivered successfully`);
+    res.status(200).json({ 
+      message: "Order marked as delivered successfully", 
+      order: order 
+    });
+  } catch (error) {
+    console.error('Error marking order as delivered:', error);
+    res.status(500).json({ 
+      message: 'Failed to mark order as delivered', 
+      error: error.message 
+    });
+  }
+});
+
+// Add route to get orders by user ID (for admin)
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const userOrders = await orderModel.find({ userId: userId }).sort({ createdAt: -1 });
+
+    res.status(200).json(userOrders);
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    res.status(500).json({ 
+      message: 'Failed to fetch user orders', 
+      error: error.message 
+    });
+  }
+});
+
+// Add route to get a single order by ID (MUST be last to avoid conflicts)
+router.get("/:id", async (req, res) => {
+  const orderId = req.params.id;
+
+  try {
+    const order = await orderModel.findById(orderId);
+
+    if (order) {
+      res.status(200).json(order);
+    } else {
+      res.status(404).json({ message: "Order not found. Please check the order ID and try again." });
+    }
+  } catch (error) {
+    console.error('Error fetching order by ID:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
