@@ -7,9 +7,17 @@
       "config": {
         "distDir": "build"
       }
+    },
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
     {
       "src": "/static/(.*)",
       "dest": "/client/build/static/$1"
@@ -20,6 +28,8 @@
     }
   ],
   "env": {
-    "REACT_APP_API_URL": "https://mern-ecomm-2yqf.onrender.com/"
+    "MONGO_URI": "@mongo-uri",
+    "RZP_KEY_ID": "@rzp-key-id",
+    "RZP_KEY_SEC": "@rzp-key-sec"
   }
 }
