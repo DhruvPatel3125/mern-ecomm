@@ -2,6 +2,11 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 
+// Create API instance with backend URL
+const API = axios.create({ 
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/' 
+});
+
 export default function Checkout({ amount }) {
     const dispatch = useDispatch();
     const userState = useSelector(state => state.loginUserReducer);
@@ -40,14 +45,14 @@ export default function Checkout({ amount }) {
         try {
             dispatch({ type: 'PLACE_ORDER_REQUEST' }); // Indicate order process start
 
-            const { data: order } = await axios.post('/api/orders/create-order', {
+            const { data: order } = await API.post('/api/orders/create-order', {
                 amount: amount * 100, // Razorpay expects amount in paise
                 currency: 'INR',
                 receipt: `receipt_${Date.now()}`, // Simple unique receipt
             });
 
             const options = {
-                key: 'rzp_test_Dz9hd6AMtKfCZE', // Replace with your test key ID
+                key: process.env.REACT_APP_RAZORPAY_KEY || 'rzp_test_Dz9hd6AMtKfCZE', // Use environment variable
                 amount: order.amount,
                 currency: order.currency,
                 order_id: order.id,
@@ -57,7 +62,7 @@ export default function Checkout({ amount }) {
                 handler: async function (response) {
                     // Payment successful, verify signature on backend
                     try {
-                        const verificationResponse = await axios.post('/api/orders/verify-payment', {
+                        const verificationResponse = await API.post('/api/orders/verify-payment', {
                             order_id: response.razorpay_order_id,
                             payment_id: response.razorpay_payment_id,
                             signature: response.razorpay_signature,
@@ -77,7 +82,7 @@ export default function Checkout({ amount }) {
                                     throw new Error("User information not available.");
                                 }
 
-                                const orderPlacementResponse = await axios.post('/api/orders/placeorder', {
+                                const orderPlacementResponse = await API.post('/api/orders/placeorder', {
                                     currentUser: userState,
                                     cartItems: cartItems,
                                     subtotal: amount, // Use the original amount

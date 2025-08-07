@@ -1,6 +1,11 @@
 import axios from "axios";
+
+const API = axios.create({ 
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/' 
+});
+
 export const placeholder = (token, subtotal) => (dispatch, getState) => {
-  const currentUser = getState().loginReduces.currentUser;
+  const currentUser = getState().loginUserReducer.currentUser;
   const demoItems = getState().cartReducer.cartItems;
 
   const cartItems = new Array();
@@ -19,13 +24,14 @@ export const placeholder = (token, subtotal) => (dispatch, getState) => {
 
   dispatch({ type: "PLACE_ORDER_REQUEST" });
 
-  axios.post("/api/orders/placeorder", { token, subtotal, currentUser, cartItems })
+  API.post("/api/orders/placeorder", { token, subtotal, currentUser, cartItems })
     .then((res) => {
       dispatch({ type: "PLACE_ORDER_SUCCESS" });
       console.log(res)
     })
     .catch((err) => {
-      dispatch({ type: "PLACE_ORDER_FAILED" });
+      console.error("Order creation failed:", err.response?.data || err.message);
+      dispatch({ type: "PLACE_ORDER_FAILED", payload: err.response?.data?.message || err.message });
     });
 };
 
@@ -33,7 +39,7 @@ export const getAllOrders = () => async (dispatch) => {
     try {
         console.log('Fetching all orders...');
         dispatch({ type: 'GET_ALL_ORDERS_REQUEST' });
-        const { data } = await axios.get('/api/orders/getallorders');
+        const { data } = await API.get('/api/orders/getallorders');
         console.log('Orders fetched successfully:', data);
         dispatch({ type: 'GET_ALL_ORDERS_SUCCESS', payload: data });
     } catch (error) {
@@ -49,7 +55,7 @@ export const getAllOrders = () => async (dispatch) => {
 export const markOrderDelivered = (orderId) => async (dispatch) => {
     try {
         dispatch({ type: 'MARK_ORDER_DELIVERED_REQUEST' });
-        const { data } = await axios.put(`/api/orders/delivered/${orderId}`);
+        const { data } = await API.put(`/api/orders/delivered/${orderId}`);
         dispatch({ type: 'MARK_ORDER_DELIVERED_SUCCESS', payload: data });
         // Refresh orders list after marking as delivered
         dispatch(getAllOrders());
@@ -65,7 +71,7 @@ export const markOrderDelivered = (orderId) => async (dispatch) => {
 export const getUserOrders = (userId) => async (dispatch) => {
     try {
         dispatch({ type: 'GET_USER_ORDERS_REQUEST' });
-        const { data } = await axios.get(`/api/orders/user/${userId}`);
+        const { data } = await API.get(`/api/orders/user/${userId}`);
         dispatch({ type: 'GET_USER_ORDERS_SUCCESS', payload: data });
     } catch (error) {
         dispatch({

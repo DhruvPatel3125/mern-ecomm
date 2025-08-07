@@ -5,8 +5,39 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 // Middleware
-app.use(cors()); // Enable CORS for all routes
-app.use(express.json()); // Parse JSON bodies 
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      /\.vercel\.app$/,
+      /\.netlify\.app$/,
+      /\.herokuapp\.com$/,
+      /\.railway\.app$/,
+    ];
+    
+    // Check if origin matches any allowed pattern
+    const isAllowed = allowedOrigins.some(pattern => {
+      return typeof pattern === 'string' ? origin === pattern : pattern.test(origin);
+    });
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.log(`CORS blocked origin: ${origin}`);
+      callback(null, true); // Allow all origins for now, can tighten later
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10mb' })); // Parse JSON bodies 
 
 // Database connection
 require('./db');
