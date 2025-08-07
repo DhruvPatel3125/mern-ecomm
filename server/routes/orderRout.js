@@ -199,18 +199,46 @@ router.get("/user/:userId", async (req, res) => {
 // Add route to get a single order by ID (MUST be last to avoid conflicts)
 router.get("/:id", async (req, res) => {
   const orderId = req.params.id;
+  
+  // Validate MongoDB ObjectId format
+  const mongoose = require('mongoose');
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
+    return res.status(400).json({ 
+      message: "Invalid order ID format. Please provide a valid order ID." 
+    });
+  }
 
   try {
+    console.log(`Searching for order with ID: ${orderId}`);
     const order = await orderModel.findById(orderId);
 
     if (order) {
+      console.log(`Order found: ${order._id}`);
       res.status(200).json(order);
     } else {
-      res.status(404).json({ message: "Order not found. Please check the order ID and try again." });
+      console.log(`No order found with ID: ${orderId}`);
+      
+      // Check if there are any orders in the database
+      const totalOrders = await orderModel.countDocuments();
+      console.log(`Total orders in database: ${totalOrders}`);
+      
+      if (totalOrders === 0) {
+        res.status(404).json({ 
+          message: "No orders found in the database. Please place an order first." 
+        });
+      } else {
+        res.status(404).json({ 
+          message: "Order not found. Please check the order ID and try again.",
+          hint: `There are ${totalOrders} orders in the database. Make sure you're using the correct order ID.`
+        });
+      }
     }
   } catch (error) {
     console.error('Error fetching order by ID:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ 
+      message: "Server error while fetching order",
+      error: error.message 
+    });
   }
 });
 

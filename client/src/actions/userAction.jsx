@@ -77,3 +77,16 @@ export const getAllUser = () => async (dispatch) => {
         dispatch({type:'GET_ALLUSERS_FAILED', payload: error.response?.data?.message || error.message});
     }
 };
+
+export const deleteUser = (userId) => async (dispatch) => {
+    try {
+        dispatch({ type: "DELETE_USER_REQUEST" });
+        await API.delete(`/api/users/${userId}`);
+        dispatch({ type: "DELETE_USER_SUCCESS" });
+    } catch (error) {
+        dispatch({ 
+            type: "DELETE_USER_FAILED", 
+            payload: error.response?.data?.message || error.message 
+        });
+    }
+};

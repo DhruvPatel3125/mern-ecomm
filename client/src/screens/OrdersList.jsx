@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Button } from 'react-bootstrap';
 import { getAllOrders, markOrderDelivered } from '../actions/orderAction';
-import Loading from '../components/Loading';
+import Loader from '../components/Loader';
 import Error from '../components/Error';
 import moment from 'moment';
 import './OrdersList.css';
@@ -119,7 +119,7 @@ export default function OrdersList() {
                     </div>
                 </div>
 
-                {loading && <Loading />}
+                {loading && <Loader />}
                 {error && (
                     <div className="alert alert-danger" role="alert">
                         <h4 className="alert-heading">Error Loading Orders</h4>

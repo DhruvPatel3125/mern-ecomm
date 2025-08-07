@@ -2,10 +2,9 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Button, Image } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import Loading from '../components/Loading';
+import Loader from '../components/Loader';
 import Error from '../components/Error';
-import { getAllProducts } from '../reducers/productReducer';
-import { deleteProduct } from '../reducers/productReducer';
+import { getAllProducts, deleteProduct } from '../actions/productAction';
 
 export default function ProductLists() {
   const navigate = useNavigate();
@@ -29,7 +28,7 @@ export default function ProductLists() {
     }
   };
 
-  if (loading || deleteLoading) return <Loading />;
+  if (loading || deleteLoading) return <Loader />;
   if (error) return <Error error={error} />;
   if (deleteError) return <Error error={deleteError} />;
 

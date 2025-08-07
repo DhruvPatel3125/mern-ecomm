@@ -4,6 +4,11 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './OrderScreen.css';
 
+// Create API instance with proper base URL
+const API = axios.create({ 
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/' 
+});
+
 export default function OrderScreen() {
     const { id } = useParams();
     const [order, setOrder] = useState(null);
@@ -13,14 +18,23 @@ export default function OrderScreen() {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                const { data } = await axios.get(`/api/orders/${id}`);
+                console.log('Fetching order with ID:', id);
+                console.log('API Base URL:', process.env.REACT_APP_API_URL || 'http://localhost:5000/');
+                
+                const { data } = await API.get(`/api/orders/${id}`);
+                console.log('Order fetched successfully:', data);
                 setOrder(data);
                 setLoading(false);
             } catch (err) {
+                console.error('Error fetching order:', err);
                 if (err.response && err.response.status === 404) {
                     setError('Order not found. Please check the order ID and try again.');
+                } else if (err.response && err.response.status === 400) {
+                    setError('Invalid order ID format. Please provide a valid order ID.');
+                } else if (err.code === 'ECONNREFUSED') {
+                    setError('Cannot connect to server. Please make sure the backend server is running on port 5000.');
                 } else {
-                    setError(err.message);
+                    setError(`Error: ${err.response?.data?.message || err.message}`);
                 }
                 setLoading(false);
             }

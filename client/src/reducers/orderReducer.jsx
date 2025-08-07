@@ -57,3 +57,31 @@ export const getUserOrdersReducer = (state = { orders: [], loading: false }, act
             return state;
     }
 };
+
+// Get order by ID reducer
+export const getOrderByIdReducer = (state = {}, action) => {
+    switch (action.type) {
+        case 'GET_ORDER_BY_ID_REQUEST':
+            return { loading: true };
+        case 'GET_ORDER_BY_ID_SUCCESS':
+            return { loading: false, order: action.payload };
+        case 'GET_ORDER_BY_ID_FAILED':
+            return { loading: false, error: action.payload };
+        default:
+            return state;
+    }
+};
+
+// Create sample order reducer
+export const createSampleOrderReducer = (state = {}, action) => {
+    switch (action.type) {
+        case 'CREATE_SAMPLE_ORDER_REQUEST':
+            return { loading: true };
+        case 'CREATE_SAMPLE_ORDER_SUCCESS':
+            return { loading: false, success: true, orderData: action.payload };
+        case 'CREATE_SAMPLE_ORDER_FAILED':
+            return { loading: false, error: action.payload };
+        default:
+            return state;
+    }
+};

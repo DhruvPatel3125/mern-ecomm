@@ -199,3 +199,17 @@ export const updateProductAction = (productId, updatedData) => async (dispatch) 
     });
   }
 };
+
+export const deleteProduct = (productId) => async (dispatch) => {
+  try {
+    dispatch({ type: 'DELETE_PRODUCT_REQUEST' });
+    await API.delete(`/api/products/delete/${productId}`);
+    dispatch({ type: 'DELETE_PRODUCT_SUCCESS' });
+    dispatch(getAllProducts()); // Refresh product list
+  } catch (error) {
+    dispatch({
+      type: 'DELETE_PRODUCT_FAILED',
+      payload: error.response?.data?.message || error.message
+    });
+  }
+};

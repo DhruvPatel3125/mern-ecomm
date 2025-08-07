@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Button } from 'react-bootstrap';
-import Loading from '../components/Loading';
+import Loader from '../components/Loader';
 import Error from '../components/Error';
-import { getAllUsers, deleteUser } from '../reducers/userReducer';
+import { getAllUser, deleteUser } from '../actions/userAction';
 
 export default function UsersList() {
   const dispatch = useDispatch();
@@ -11,12 +11,12 @@ export default function UsersList() {
   const { loading: deleteLoading, error: deleteError, success: deleteSuccess } = useSelector((state) => state.deleteUser);
 
   useEffect(() => {
-    dispatch(getAllUsers());
+    dispatch(getAllUser());
   }, [dispatch]);
 
   useEffect(() => {
     if (deleteSuccess) {
-      dispatch(getAllUsers());
+      dispatch(getAllUser());
     }
   }, [deleteSuccess, dispatch]);
 
@@ -26,7 +26,7 @@ export default function UsersList() {
     }
   };
 
-  if (loading || deleteLoading) return <Loading />;
+  if (loading || deleteLoading) return <Loader />;
   if (error) return <Error error={error} />;
   if (deleteError) return <Error error={deleteError} />;
 
