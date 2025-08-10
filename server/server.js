@@ -36,7 +36,11 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-app.use(cors(corsOptions));
+app.use(cors({
+  origin:"http://localhost:3000",
+  credentials:true,
+  optionsSuccessStatus:200
+}));
 app.use(express.json({ limit: '10mb' })); // Parse JSON bodies 
 
 // Database connection

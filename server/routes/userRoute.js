@@ -4,16 +4,21 @@ const User = require("../models/userModel");
 
 router.post("/register", async (req, res) => {
     try {
-        const docs = await User.find({ email: req.body.email });
+        const { name, email, password } = req.body;
+        
+        console.log("Registration attempt for email:", email);
+        
+        const docs = await User.find({ email: email.trim() });
         if (docs.length > 0) {
             return res.status(400).send("User email already exists");
         } else {
             const newUser = new User({
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password
+                name: name.trim(),
+                email: email.trim(),
+                password: password.trim()
             });
             await newUser.save();
+            console.log("User registered successfully:", email);
             res.status(201).send("User registered successfully");
         }
     } catch (err) {
@@ -24,18 +29,30 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
+        const { email, password } = req.body;
+        
+        console.log("Login attempt for email:", email);
+        
+        const user = await User.findOne({ email: email.trim() });
+        console.log("User found:", user ? 'Yes' : 'No');
+        
         if (user) {
-            if (user.password === req.body.password) {
+            // Trim and compare passwords
+            const isPasswordValid = user.password.trim() === password.trim();
+            console.log("Password match:", isPasswordValid);
+            
+            if (isPasswordValid) {
                 res.send({
                     _id: user.id,
                     name: user.name,
                     email: user.email
                 });
             } else {
+                console.log("Password mismatch - Stored:", user.password, "Provided:", password);
                 res.status(401).send("Invalid email or password");
             }
         } else {
+            console.log("User not found with email:", email);
             res.status(401).send("Invalid email or password");
         }
     } catch (err) {
