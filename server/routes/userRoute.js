@@ -45,7 +45,8 @@ router.post("/login", async (req, res) => {
                 res.send({
                     _id: user.id,
                     name: user.name,
-                    email: user.email
+                    email: user.email,
+                    isAdmin: user.isAdmin
                 });
             } else {
                 console.log("Password mismatch - Stored:", user.password, "Provided:", password);
@@ -84,7 +85,8 @@ router.post("/update", async (req, res) => {
             user: {
                 _id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                isAdmin: user.isAdmin
             }
         });
 
