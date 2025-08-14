@@ -32,6 +32,10 @@ app.use(cors(corsOptions));
 // Make sure preflight requests succeed quickly
 app.options("*", cors(corsOptions));
 
+// Parse JSON and URL-encoded bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Database connection
 require('./db');
 
