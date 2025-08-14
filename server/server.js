@@ -5,43 +5,32 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 // Middleware
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://shy-shop.vercel.app",
+];
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
+  origin: (origin, callback) => {
+    // Allow non-browser requests (e.g., curl, Postman) which may have no Origin
     if (!origin) return callback(null, true);
-    
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      /\.vercel\.app$/,
-      /\.netlify\.app$/,
-      /\.herokuapp\.com$/,
-      /\.railway\.app$/,
-    ];
-    
-    // Check if origin matches any allowed pattern
-    const isAllowed = allowedOrigins.some(pattern => {
-      return typeof pattern === 'string' ? origin === pattern : pattern.test(origin);
-    });
-    
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      console.log(`CORS blocked origin: ${origin}`);
-      callback(null, true); // Allow all origins for now, can tighten later
-    }
+
+    const isWhitelisted =
+      allowedOrigins.includes(origin) ||
+      // Optional: allow any Vercel preview like https://<branch>-<org>.vercel.app
+      /\.vercel\.app$/.test(new URL(origin).hostname);
+
+    if (isWhitelisted) return callback(null, true);
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // Only if you use cookies/auth headers across origins
 };
 
-app.use(cors({
-  origin:"http://localhost:3000",
-  credentials:true,
-  optionsSuccessStatus:200
-}));
-app.use(express.json({ limit: '10mb' })); // Parse JSON bodies 
+// Apply before routes
+app.use(cors(corsOptions));
+// Make sure preflight requests succeed quickly
+app.options("*", cors(corsOptions));
 
 // Database connection
 require('./db');
